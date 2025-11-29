@@ -299,7 +299,7 @@ export default function ScenarioRunner() {
 
       <section className="actions">
         <button onClick={handleNextMonth} disabled={isFinished} className="btn primary">
-          {isFinished ? "Scenario complete" : "Run next month"}
+          {isFinished ? "Scenario complete" : "Simulate Next Month"}
         </button>
         <button onClick={handleReset} className="btn">
           Reset
@@ -308,7 +308,7 @@ export default function ScenarioRunner() {
 
       {/* Floating simulate button for mobile/web to avoid long scrolls */}
       {!isFinished && (
-        <button className="fab" aria-label="Run next month" onClick={handleNextMonth}>
+        <button className="fab" aria-label="Simulate Next Month" onClick={handleNextMonth}>
           ▶ Simulate Next Month
         </button>
       )}
