@@ -12,15 +12,15 @@ function toPlan(ids: string[]): AllocationPlan {
 export default function ScenarioRunner() {
   const params = useParams();
   const initial = getScenarioById(params.id ?? "") ?? creditCardScenario;
-  const [scenario] = useState(initial);
-  const [state, setState] = useState<ScenarioState>(scenario.initialState);
+  const [scenario, setScenario] = useState(initial);
+  const [state, setState] = useState<ScenarioState>(initial.initialState);
   const [history, setHistory] = useState<MonthResult[]>([]);
   const [isFinished, setIsFinished] = useState(false);
   // New UI model: per-category adjustments and explicit allocation plans
   const [wantsAdjust, setWantsAdjust] = useState<Record<string, number>>({});
   const [needsAdjust, setNeedsAdjust] = useState<Record<string, number>>({});
-  const [debtPlan, setDebtPlan] = useState<AllocationPlan>(() => toPlan(scenario.initialState.debts.map((d) => d.id)));
-  const [investPlan, setInvestPlan] = useState<AllocationPlan>(() => toPlan(scenario.initialState.investments.map((i) => i.id)));
+  const [debtPlan, setDebtPlan] = useState<AllocationPlan>(() => toPlan(initial.initialState.debts.map((d) => d.id)));
+  const [investPlan, setInvestPlan] = useState<AllocationPlan>(() => toPlan(initial.initialState.investments.map((i) => i.id)));
   const [showNotices, setShowNotices] = useState(false);
   const [fastForwardCount, setFastForwardCount] = useState<number>(1);
   const [collapsedMonths, setCollapsedMonths] = useState<Record<number, boolean>>({});
@@ -50,6 +50,22 @@ export default function ScenarioRunner() {
       );
     } catch {}
   }, [wantsAdjust, needsAdjust, debtPlan, investPlan]);
+
+  // When the route id changes, load the new scenario and reset state/plans
+  useEffect(() => {
+    const next = getScenarioById(params.id ?? "") ?? creditCardScenario;
+    setScenario(next);
+    setState(next.initialState);
+    setHistory([]);
+    setIsFinished(false);
+    setWantsAdjust({});
+    setNeedsAdjust({});
+    setDebtPlan(toPlan(next.initialState.debts.map((d) => d.id)));
+    setInvestPlan(toPlan(next.initialState.investments.map((i) => i.id)));
+    setShowNotices(false);
+    setFastForwardCount(1);
+    setCollapsedMonths({});
+  }, [params.id]);
 
   const totalPlannedDebt = useMemo(() => Object.values(debtPlan.amounts).reduce((a, b) => a + (b || 0), 0), [debtPlan]);
   const totalPlannedInvest = useMemo(() => Object.values(investPlan.amounts).reduce((a, b) => a + (b || 0), 0), [investPlan]);

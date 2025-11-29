@@ -11,13 +11,8 @@ function App() {
       <Route path="/" element={<Home onStart={() => { /* navigate to gallery */ }} />} />
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/custom" element={<CustomBuilder />} />
-      {/* Scenario with nested tabs */}
-      <Route path="/scenario/:id/*" element={<ScenarioRunner />}> 
-        {/* Default to overview */}
-        <Route index element={<Navigate to="overview" replace />} />
-        <Route path="overview" element={<div />} />
-        <Route path="history" element={<div />} />
-      </Route>
+      {/* Scenario route; ScenarioRunner handles tab content based on pathname */}
+      <Route path="/scenario/:id/*" element={<ScenarioRunner />} />
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
