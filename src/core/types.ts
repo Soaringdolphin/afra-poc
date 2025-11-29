@@ -1,55 +1,129 @@
 // types.ts
 
-export interface ScenarioState {
-  month: number; // current month, 0–12
-  income: number;
-  housingCost: number;
-  basicExpenses: number;
-  variableExpenses: number; // adjustable over time by user choices
-  cash: number;             // acts as cash savings by default
-  investments: number;
-  investmentApr: number;    // e.g. 0.05 for 5% annual
-  debtBalance: number;
-  debtApr: number;          // e.g. 0.1999 for 19.99 percent
-  goalType: "pay_off_debt" | "build_cash_buffer";
-  goalAmount: number;
+// Expanded engine types (small, readable, multi-account)
+
+export interface FixedExpenseItem {
+  id: string;
+  name: string;
+  baseMonthly: number;
+  arrears: number; // carried unpaid balance, no interest in v1
 }
 
-/**
- * One month's set of user decisions.
- * If a field is omitted, it defaults to 0 in the engine,
- * except debtPayment, which defaults to the computed minimum.
- */
+export interface VariableCategory {
+  id: string;
+  name: string;
+  planned: number; // planned spend per month
+}
+
+export interface DebtAccount {
+  id: string;
+  name: string;
+  balance: number;
+  apr: number; // annual percentage rate
+  // Suggested minimum display helper (engine does not enforce)
+  minimumRule?: {
+    base: number; // e.g., 25
+  };
+}
+
+export interface InvestmentAccount {
+  id: string;
+  name: string;
+  balance: number;
+  apr: number; // expected annual return
+}
+
+export interface ScenarioState {
+  month: number; // current month
+  cash: number;
+  income: number;
+
+  // Expenses
+  variableWants: VariableCategory[];
+  variableNeeds: VariableCategory[];
+  fixedExpenses: FixedExpenseItem[]; // processed in listed priority order
+
+  // Accounts
+  debts: DebtAccount[];
+  investments: InvestmentAccount[];
+}
+
+// Choice: user plan for the month
+export interface AllocationPlan {
+  // priority order of ids to fund first
+  priority: string[];
+  // planned amount per id
+  amounts: Record<string, number>;
+}
+
 export interface ScenarioChoice {
-  /** How much of leftover cash to move into investments this month */
-  investContribution?: number;
+  // Adjust planned amounts for variable categories for this month
+  variableWantsAdjust?: Record<string, number>; // delta to planned
+  variableNeedsAdjust?: Record<string, number>; // delta to planned
 
-  /** Total payment toward debt this month (not just extra) */
-  debtPayment?: number;
+  // Fixed expenses have no choice input besides priority already in state
 
-  /**
-   * Change to monthly variable expenses.
-   * Negative = spend less, positive = spend more.
-   * This persists in state.variableExpenses.
-   */
-  variableExpenseAdjustment?: number;
+  // Debt payments plan (priority capping)
+  debtPlan?: AllocationPlan;
+  // Investment contributions plan (priority capping)
+  investPlan?: AllocationPlan;
+}
+
+export interface ExpenseSpendSummary {
+  planned: number;
+  actual: number;
+}
+
+export interface FixedExpenseSummary {
+  id: string;
+  name: string;
+  due: number;
+  paid: number;
+  newArrears: number;
+}
+
+export interface DebtSummary {
+  id: string;
+  name: string;
+  startBalance: number;
+  interest: number;
+  owedThisCycle: number;
+  plannedPayment: number;
+  actualPayment: number;
+  suggestedMinimum: number; // informational only
+  metMinimum: boolean;
+  endBalance: number;
+}
+
+export interface InvestmentSummary {
+  id: string;
+  name: string;
+  startBalance: number;
+  plannedContribution: number;
+  actualContribution: number;
+  growth: number; // from starting balance only
+  endBalance: number;
 }
 
 export interface MonthResult {
   newState: ScenarioState;
-  interestCharged: number;    // interest added this month before payment
-  totalDebtPayment: number;   // actual amount paid toward debt this month
-  cashChange: number;         // delta in cash vs previous month
-  minPaymentDue: number;      // 25 + interest for this month
-  metMinimum: boolean;        // whether totalDebtPayment >= minPaymentDue
 
-  // Planned vs actual allocations for this month
-  plannedInvest: number;       // what the player tried to invest
-  plannedDebtPayment: number;  // what the player tried to pay toward debt
-  actualInvest: number;        // what actually went into investments
-  actualDebtPayment: number;   // what actually went to debt
-  availableForAllocation: number; // cash available after bills
-  wasScaled: boolean;          // true if the plan was scaled down
+  // Cash movements
+  cashChange: number;
+
+  // Expenses
+  wantsSummary: ExpenseSpendSummary;
+  needsSummary: ExpenseSpendSummary;
+  fixedSummaries: FixedExpenseSummary[];
+
+  // Accounts
+  debtSummaries: DebtSummary[];
+  investmentSummaries: InvestmentSummary[];
+
+  // Simple metrics
+  netWorthStart: number;
+  netWorthEnd: number;
+  netWorthChange: number;
 }
 
 export interface ScenarioConfig {

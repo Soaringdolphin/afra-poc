@@ -1,13 +1,14 @@
 /* Pastel green theme */
 :root {
-  --bg: #f6fbf8; /* light airy background */
+  /* Afra-inspired palette */
+  --bg: #f4fbf7; /* airy mint */
   --card: #ffffff;
-  --border: #e2efe7;
-  --text: #0f2e24; /* deep green text */
-  --muted: #5b746a;
-  --primary: #86d9b7; /* Afra-like pastel green */
-  --primary-strong: #5fcc9d;
-  --accent: #e9f7f0; /* soft mint panel */
+  --border: #e0efe7;
+  --text: #0e2d23; /* deep green */
+  --muted: #5c7469;
+  --primary: #7fd4b1; /* pastel green */
+  --primary-strong: #4fc39a; /* richer green */
+  --accent: #e7f6ef; /* soft mint panel */
   --brand: #1f8a5e; /* brand deep green */
   --warn: #b45309;
 }
@@ -48,11 +49,40 @@ body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto
 
 .actions { display: flex; gap: 8px; margin: 12px 0 24px; }
 .btn { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; transition: transform 0.05s ease, box-shadow 0.15s ease; }
-.btn.primary { background: var(--primary); border-color: var(--primary-strong); }
+.btn.primary { background: linear-gradient(180deg, var(--primary), var(--primary-strong)); border-color: var(--primary-strong); color: #073b2a; }
 .btn.small { padding: 8px 12px; font-size: 13px; }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 16px rgba(0,0,0,0.08); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Modern subtle glass card effect */
+.card { backdrop-filter: saturate(1.15) blur(2px); }
+
+/* Refine brand sizing/weight for header and home */
+.brandName { font-weight: 300; letter-spacing: 0.3px; }
+.brandNameLarge { font-weight: 300; letter-spacing: 0.4px; }
+
+/* Accent focus ring for inputs */
+.input { box-shadow: inset 0 1px 0 rgba(0,0,0,0.03); }
+.input:focus { outline: 2px solid var(--primary-strong); background: #f1fff9; }
 
 .history { margin-top: 8px; }
 .muted { color: var(--muted); }
 .warning { color: var(--warn); }
+
+/* Modal (dismissible pop-up) */
+.modalBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); display: grid; place-items: center; z-index: 1000; }
+.modalCard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 12px 28px rgba(0,0,0,0.18); max-width: 680px; width: calc(100% - 32px); }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.modalTitle { margin: 0; font-size: 18px; }
+.closeBtn { border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--muted); }
+
+/* History layout polish */
+.historyGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.historyMetric { background: var(--accent); border: 1px dashed var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+.historyLabel { color: var(--muted); font-size: 13px; }
+.historyValue { font-weight: 600; font-size: 16px; }
+.historySection { margin-top: 12px; }
+.historyTitle { margin: 0 0 6px; font-size: 16px; color: var(--text); }
+
+/* Arrears highlight */
+.arrears { color: #b91c1c; }

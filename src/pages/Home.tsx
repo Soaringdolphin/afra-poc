@@ -7,8 +7,7 @@ type HomeProps = {
 export default function Home({ onStart }: HomeProps) {
   return (
     <main className="container homeCenter">
-      <div className="brand brandCentered">
-        <span className="brandName brandNameLarge">Afra</span>
+      <div className="brand brandCentered" style={{ alignItems: "center", gap: 16 }}>
         <img
           src="/afralogo1.png"
           alt="Afra"
@@ -17,10 +16,11 @@ export default function Home({ onStart }: HomeProps) {
             (e.target as HTMLImageElement).style.display = "none";
           }}
         />
+        <span className="brandName brandNameLarge">Afra</span>
       </div>
 
       <section className="card heroCard">
-        <h1 className="title" style={{ marginBottom: 8, textAlign: "center" }}>
+        <h1 className="title" style={{ marginBottom: 8, textAlign: "center", fontWeight: 300 }}>
           Grow toward a better financial future.
         </h1>
         <p className="subtitle" style={{ marginBottom: 20, textAlign: "center" }}>
@@ -28,7 +28,7 @@ export default function Home({ onStart }: HomeProps) {
         </p>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <button className="btn primary" onClick={onStart}>
-            Open Web App
+            Launch Afra Simulator
           </button>
         </div>
       </section>
