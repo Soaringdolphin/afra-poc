@@ -94,13 +94,38 @@ export default function ScenarioRunner() {
             <label key={c.id} className="field">
               <span className="fieldLabel">{c.name}</span>
               <span className="subtext">Planned ${c.planned.toFixed(2)} • Enter delta (e.g., -50 to spend less)</span>
-              <input
-                type="number"
-                className="input"
-                placeholder="Adjustment this month"
-                value={String(wantsAdjust[c.id] ?? "")}
-                onChange={(e) => setWantsAdjust((prev) => ({ ...prev, [c.id]: e.target.value === "" ? undefined as any : Number(e.target.value) }))}
-              />
+              <div className="inputGroup">
+                <button type="button" className="signToggle" onClick={() => setWantsAdjust((prev) => {
+                  const v = Number(prev[c.id] ?? 0);
+                  const flipped = v === 0 ? -0 : -v;
+                  return { ...prev, [c.id]: flipped };
+                })} aria-label="Toggle sign">±</button>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  className="input"
+                  placeholder="Adjustment this month"
+                  value={String(wantsAdjust[c.id] ?? "")}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const num = raw === "" ? NaN : Number(raw);
+                    if (isNaN(num)) {
+                      setWantsAdjust((prev) => ({ ...prev, [c.id]: undefined as any }));
+                    } else {
+                      const rounded = Math.round(num * 100) / 100;
+                      setWantsAdjust((prev) => ({ ...prev, [c.id]: rounded }));
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const num = Number(e.target.value);
+                    if (!isNaN(num)) {
+                      const fixed = (Math.round(num * 100) / 100).toFixed(2);
+                      e.target.value = fixed;
+                    }
+                  }}
+                />
+              </div>
               <span className="subtext">This month total: ${(c.planned + (Number(wantsAdjust[c.id]) || 0)).toFixed(2)}</span>
             </label>
           ))}
@@ -114,13 +139,38 @@ export default function ScenarioRunner() {
             <label key={c.id} className="field">
               <span className="fieldLabel">{c.name}</span>
               <span className="subtext">Planned ${c.planned.toFixed(2)} • Enter delta (e.g., +25 to spend more)</span>
-              <input
-                type="number"
-                className="input"
-                placeholder="Adjustment this month"
-                value={String(needsAdjust[c.id] ?? "")}
-                onChange={(e) => setNeedsAdjust((prev) => ({ ...prev, [c.id]: e.target.value === "" ? undefined as any : Number(e.target.value) }))}
-              />
+              <div className="inputGroup">
+                <button type="button" className="signToggle" onClick={() => setNeedsAdjust((prev) => {
+                  const v = Number(prev[c.id] ?? 0);
+                  const flipped = v === 0 ? -0 : -v;
+                  return { ...prev, [c.id]: flipped };
+                })} aria-label="Toggle sign">±</button>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  className="input"
+                  placeholder="Adjustment this month"
+                  value={String(needsAdjust[c.id] ?? "")}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const num = raw === "" ? NaN : Number(raw);
+                    if (isNaN(num)) {
+                      setNeedsAdjust((prev) => ({ ...prev, [c.id]: undefined as any }));
+                    } else {
+                      const rounded = Math.round(num * 100) / 100;
+                      setNeedsAdjust((prev) => ({ ...prev, [c.id]: rounded }));
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const num = Number(e.target.value);
+                    if (!isNaN(num)) {
+                      const fixed = (Math.round(num * 100) / 100).toFixed(2);
+                      e.target.value = fixed;
+                    }
+                  }}
+                />
+              </div>
               <span className="subtext">This month total: ${(c.planned + (Number(needsAdjust[c.id]) || 0)).toFixed(2)}</span>
             </label>
           ))}
@@ -158,8 +208,17 @@ export default function ScenarioRunner() {
                     type="number"
                     className="input"
                     min={0}
+                    step={0.01}
                     value={String(debtPlan.amounts[id] ?? 0)}
-                    onChange={(e) => setDebtPlan((prev) => ({ priority: prev.priority, amounts: { ...prev.amounts, [id]: Number(e.target.value) } }))}
+                    onChange={(e) => {
+                      const num = Number(e.target.value);
+                      const rounded = isNaN(num) ? 0 : Math.max(0, Math.round(num * 100) / 100);
+                      setDebtPlan((prev) => ({ priority: prev.priority, amounts: { ...prev.amounts, [id]: rounded } }));
+                    }}
+                    onBlur={(e) => {
+                      const num = Number(e.target.value);
+                      if (!isNaN(num)) e.target.value = (Math.max(0, Math.round(num * 100) / 100)).toFixed(2);
+                    }}
                   />
                   {state.debts.length > 1 && (
                     <>
@@ -200,8 +259,17 @@ export default function ScenarioRunner() {
                     type="number"
                     className="input"
                     min={0}
+                    step={0.01}
                     value={String(investPlan.amounts[id] ?? 0)}
-                    onChange={(e) => setInvestPlan((prev) => ({ priority: prev.priority, amounts: { ...prev.amounts, [id]: Number(e.target.value) } }))}
+                    onChange={(e) => {
+                      const num = Number(e.target.value);
+                      const rounded = isNaN(num) ? 0 : Math.max(0, Math.round(num * 100) / 100);
+                      setInvestPlan((prev) => ({ priority: prev.priority, amounts: { ...prev.amounts, [id]: rounded } }));
+                    }}
+                    onBlur={(e) => {
+                      const num = Number(e.target.value);
+                      if (!isNaN(num)) e.target.value = (Math.max(0, Math.round(num * 100) / 100)).toFixed(2);
+                    }}
                   />
                   {state.investments.length > 1 && (
                     <>
@@ -237,6 +305,13 @@ export default function ScenarioRunner() {
           Reset
         </button>
       </section>
+
+      {/* Floating simulate button for mobile/web to avoid long scrolls */}
+      {!isFinished && (
+        <button className="fab" aria-label="Run next month" onClick={handleNextMonth}>
+          ▶ Simulate Next Month
+        </button>
+      )}
 
       {showNotices && history.length > 0 && (() => {
         const last = history[history.length - 1];
