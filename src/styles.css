@@ -75,6 +75,8 @@ body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto
 
 /* Modern subtle glass card effect */
 .card { backdrop-filter: saturate(1.15) blur(2px); }
+/* Add spacing below metrics inside cards so bottom buttons don't crowd */
+.card .metrics { margin-bottom: 12px; }
 
 /* Refine brand sizing/weight for header and home */
 .brandName { font-weight: 300; letter-spacing: 0.3px; }
@@ -105,3 +107,110 @@ body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto
 
 /* Arrears highlight */
 .arrears { color: #b91c1c; }
+
+/* Tabs */
+.tabNav {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+.tabNav .tab {
+  display: inline-block;
+  padding: 8px 12px;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 6px 6px 0 0;
+}
+.tabNav .tab:hover { background: #f3f4f6; }
+.tabNav .tab.active {
+  color: #111827;
+  font-weight: 600;
+  border-bottom: 2px solid #2563eb;
+}
+.tabNav .tab:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* Summary bar */
+.summaryBar {
+  position: sticky;
+  top: 56px; /* below brandBar */
+  z-index: 10;
+  background: #f7fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.summaryItem { display: flex; flex-direction: column; }
+.summaryLabel { color: #6b7280; font-size: 12px; }
+.summaryValue { color: #111827; font-weight: 600; }
+.summaryAlert { color: #b91c1c; font-weight: 600; }
+
+/* Builder add buttons */
+.btn.secondary {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+.btn.secondary:hover { background: #f9fafb; }
+.btn.small { padding: 4px 8px; font-size: 12px; }
+
+/* Builder remove buttons */
+.btn.danger {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+.btn.danger:hover { background: #fff5f5; }
+
+/* Section controls spacing */
+.sectionControls {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Inline row remove (X) */
+.rowControls {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr; /* X, field1, field2 */
+  align-items: center; /* vertically center all children in the row */
+  gap: 10px;
+}
+.rowControls > * { align-self: center; }
+.btn.icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  transform: translateY(0); /* center align within the row */
+  align-self: center; /* ensure vertical centering despite font metrics */
+  margin-top: 22px;
+}
+
+.btn.icon:hover { background: #f9fafb; }
+.btn.icon.danger { border-color: #fecaca; color: #b91c1c; }
+
+/* Gallery card start button spacing and pin to bottom */
+.cardStart {
+  display: block;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: 12px; /* extra breathing room above rounded edge */
+  text-align: center;
+}

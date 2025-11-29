@@ -1,10 +1,14 @@
 // src/pages/Home.tsx
 
+import { useNavigate } from "react-router-dom";
+// Landing page only; gallery moved to /gallery
+
 type HomeProps = {
-  onStart: () => void;
+  onStart?: () => void;
 };
 
 export default function Home({ onStart }: HomeProps) {
+  const navigate = useNavigate();
   return (
     <main className="container homeCenter">
       <div className="brand brandCentered" style={{ alignItems: "center", gap: 16 }}>
@@ -27,11 +31,10 @@ export default function Home({ onStart }: HomeProps) {
           Afra makes financial literacy feel easy, not overwhelming.
         </p>
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <button className="btn primary" onClick={onStart}>
-            Launch Afra Simulator
-          </button>
+          <button className="btn primary" onClick={() => { navigate('/gallery'); onStart?.(); }}>Launch Afra Simulator</button>
         </div>
       </section>
+
     </main>
   );
 }

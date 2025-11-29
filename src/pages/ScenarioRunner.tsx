@@ -1,6 +1,7 @@
 // src/pages/ScenarioRunner.tsx
 import { useMemo, useState, useEffect } from "react";
-import { creditCardScenario } from "../core/scenarios";
+import { NavLink, useParams, Link } from "react-router-dom";
+import { getScenarioById, creditCardScenario } from "../core/scenarios";
 import type { ScenarioState, MonthResult, ScenarioChoice, AllocationPlan } from "../core/types";
 import { runMonth } from "../core/engine";
 
@@ -9,7 +10,9 @@ function toPlan(ids: string[]): AllocationPlan {
 }
 
 export default function ScenarioRunner() {
-  const [scenario] = useState(creditCardScenario);
+  const params = useParams();
+  const initial = getScenarioById(params.id ?? "") ?? creditCardScenario;
+  const [scenario] = useState(initial);
   const [state, setState] = useState<ScenarioState>(scenario.initialState);
   const [history, setHistory] = useState<MonthResult[]>([]);
   const [isFinished, setIsFinished] = useState(false);
@@ -112,15 +115,41 @@ export default function ScenarioRunner() {
           {/* Logo will render when /public/afralogo1.png exists */}
           <img src="/afralogo1.png" alt="Afra" className="brandLogo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         </div>
-        {/* Hidden since Home now provides entry CTA */}
+        <div>
+          <Link to="/gallery" className="btn">Home</Link>
+        </div>
       </nav>
 
       <header className="header">
         <h1 className="title">{scenario.title}</h1>
         <p className="subtitle">{scenario.description}</p>
       </header>
+      {/* Summary Bar */}
+      <section className="summaryBar">
+        <div className="summaryGrid">
+          <div className="summaryItem"><span className="summaryLabel">Month</span><span className="summaryValue">{state.month}</span></div>
+          <div className="summaryItem"><span className="summaryLabel">Cash</span><span className="summaryValue">${state.cash.toFixed(2)}</span></div>
+          <div className="summaryItem"><span className="summaryLabel">Net Worth Δ</span><span className="summaryValue">${(history.length > 0 ? history[history.length - 1].netWorthChange : 0).toFixed(2)}</span></div>
+          <div className="summaryItem"><span className="summaryLabel">Alerts</span><span className="summaryValue">{(() => {
+            if (history.length === 0) return '—';
+            const last = history[history.length - 1];
+            const missed = last.debtSummaries.some((d) => !d.metMinimum);
+            const arrears = last.fixedSummaries.some((f) => f.newArrears > 0);
+            return missed || arrears ? <span className="summaryAlert">Check Notices</span> : 'OK';
+          })()}</span></div>
+        </div>
+      </section>
+        {/* Tab navigation */}
+        <nav className="tabNav" role="tablist" aria-label="Scenario panels" style={{ marginBottom: 16 }}>
+          <NavLink to={`/scenario/${params.id ?? 'default'}/overview`} role="tab" className={({ isActive }) => `tab ${isActive ? 'active' : ''}`}>Overview</NavLink>
+          <NavLink to={`/scenario/${params.id ?? 'default'}/history`} role="tab" className={({ isActive }) => `tab ${isActive ? 'active' : ''}`}>History</NavLink>
+        </nav>
+      
 
+      {/* Overview tab content only */}
+      {location.pathname.endsWith('/overview') && (
       <section className="card">
+        {/* Overview tab content */}
         <h2 className="sectionTitle">Snapshot</h2>
         <div className="metrics">
           <div className="metric"><span className="label">Month</span><span className="value">{state.month}</span></div>
@@ -131,7 +160,10 @@ export default function ScenarioRunner() {
           <div className="metric"><span className="label">Net Worth</span><span className="value">${(state.cash + state.investments.reduce((a,i)=>a+i.balance,0) - state.debts.reduce((a,d)=>a+d.balance,0)).toFixed(2)}</span></div>
         </div>
       </section>
+      )}
 
+      {/* Overview includes plans editors and everything except history */}
+      {location.pathname.endsWith('/overview') && (
       <section className="card">
         <h2 className="sectionTitle">Variable Wants</h2>
         <div className="formGrid">
@@ -176,7 +208,9 @@ export default function ScenarioRunner() {
           ))}
         </div>
       </section>
+      )}
 
+      {location.pathname.endsWith('/overview') && (
       <section className="card">
         <h2 className="sectionTitle">Variable Needs</h2>
         <div className="formGrid">
@@ -221,7 +255,9 @@ export default function ScenarioRunner() {
           ))}
         </div>
       </section>
+      )}
 
+      {location.pathname.endsWith('/overview') && (
       <section className="card">
         <h2 className="sectionTitle">Fixed Expenses</h2>
         <div className="metrics">
@@ -238,7 +274,9 @@ export default function ScenarioRunner() {
           ))}
         </div>
       </section>
+      )}
 
+      {location.pathname.endsWith('/overview') && (
       <section className="card">
         <h2 className="sectionTitle">Debt</h2>
         <div className="formGrid">
@@ -292,7 +330,9 @@ export default function ScenarioRunner() {
         </div>
         <p className="muted">Total planned debt payments: ${totalPlannedDebt.toFixed(2)}</p>
       </section>
+      )}
 
+      {location.pathname.endsWith('/overview') && (
       <section className="card">
         <h2 className="sectionTitle">Investments</h2>
         <div className="formGrid">
@@ -343,6 +383,7 @@ export default function ScenarioRunner() {
         </div>
         <p className="muted">Total planned contributions: ${totalPlannedInvest.toFixed(2)}</p>
       </section>
+      )}
 
       <section className="actions">
         <div className="fastForwardBar">
@@ -405,7 +446,10 @@ export default function ScenarioRunner() {
         );
       })()}
 
+      {/* History tab content only */}
+      {location.pathname.endsWith('/history') && (
       <section className="history">
+        {/* History tab content */}
         <h2 className="sectionTitle">Monthly History</h2>
         {history.length === 0 && <p className="muted">No months run yet.</p>}
         {[...history].slice().reverse().map((m, revIndex) => {
@@ -463,6 +507,7 @@ export default function ScenarioRunner() {
           );
         })}
       </section>
+      )}
     </main>
   );
 }

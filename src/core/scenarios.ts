@@ -41,6 +41,28 @@ export const creditCardScenario: ScenarioConfig = {
 
 export const scenarios: ScenarioConfig[] = [creditCardScenario];
 
+const CUSTOM_STORE_KEY = "afra:customScenarios";
+
+export function saveCustomScenario(config: ScenarioConfig) {
+  try {
+    const raw = localStorage.getItem(CUSTOM_STORE_KEY);
+    const map: Record<string, ScenarioConfig> = raw ? JSON.parse(raw) : {};
+    map[config.id] = config;
+    localStorage.setItem(CUSTOM_STORE_KEY, JSON.stringify(map));
+  } catch {}
+}
+
 export function getScenarioById(id: string): ScenarioConfig | undefined {
-  return scenarios.find((s) => s.id === id);
+  // Presets first
+  const preset = scenarios.find((s) => s.id === id);
+  if (preset) return preset;
+  // Then custom from localStorage
+  try {
+    const raw = localStorage.getItem(CUSTOM_STORE_KEY);
+    if (!raw) return undefined;
+    const map: Record<string, ScenarioConfig> = JSON.parse(raw);
+    return map[id];
+  } catch {
+    return undefined;
+  }
 }
