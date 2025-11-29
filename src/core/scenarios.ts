@@ -34,7 +34,7 @@ export const creditCardScenario: ScenarioConfig = {
     ],
 
     investments: [
-      { id: "starter", name: "Starter Index Fund", balance: 0, apr: 0.03 },
+      { id: "starter", name: "Starter Index Fund", balance: 0, apr: 0.07 },
     ],
   },
 };
